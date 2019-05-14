@@ -12,9 +12,10 @@ class Piece:
         self.color = color
         self.selected = False
 
-    def move_to(self, x, y):
-        self.x = x
-        self.y = y
+    def move_to(self, pos):
+        self.x = pos[0]
+        self.y = pos[1]
+        self.selected = False
 
     def king(self):
         self.type = 'king'
@@ -29,14 +30,35 @@ class Piece:
             if self.color == 'white':
                 moves.append([self.x-1, self.y+1])
                 moves.append([self.x+1, self.y+1])
+                for p in other_player.get_pieces():
+                    if p.x == self.x-1 and p.y == self.y+1:
+                        moves.append([self.x-2, self.y+2])
+                    if p.x == self.x+1 and p.y == self.y+1:
+                        moves.append([self.x+2, self.y+2])
             else:
                 moves.append([self.x-1, self.y-1])
                 moves.append([self.x+1, self.y-1])
+                for p in other_player.get_pieces():
+                    if p.x == self.x-1 and p.y == self.y-1:
+                        moves.append([self.x-2, self.y-2])
+                    if p.x == self.x+1 and p.y == self.y-1:
+                        moves.append([self.x+2, self.y-2])
         else:
             moves.append([self.x-1, self.y+1])
             moves.append([self.x+1, self.y+1])
             moves.append([self.x-1, self.y-1])
             moves.append([self.x+1, self.y-1])
+
+            for p in other_player.get_pieces():
+                if p.x == self.x-1 and p.y == self.y+1:
+                    moves.append([self.x-2, self.y+2])
+                if p.x == self.x+1 and p.y == self.y+1:
+                    moves.append([self.x+2, self.y+2])
+                if p.x == self.x-1 and p.y == self.y-1:
+                    moves.append([self.x-2, self.y-2])
+                if p.x == self.x+1 and p.y == self.y-1:
+                    moves.append([self.x+2, self.y-2])
+
 
         for move in moves:
             already = False
@@ -53,6 +75,13 @@ class Piece:
             if already == False:
                 final_moves.append(move)
         return final_moves
+
+
+    def update(self):
+        if self.color == 'white' and self.y == 7:
+            self.type = 'king'
+        elif self.color == 'black' and self.y == 0:
+            self.type = 'king'
 
 
 

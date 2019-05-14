@@ -20,6 +20,10 @@ class Player:
                     self.pieces.append(Piece(x, 5, color))
                     self.pieces.append(Piece(x, 7, color))
 
+    def update(self):
+        for p in self.pieces:
+            p.update()
+
     def get_pieces(self):
         return list(self.pieces)
 

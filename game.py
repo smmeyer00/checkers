@@ -18,11 +18,22 @@ class Game:
         self.player2 = Player('black')
         self.screen = pygame.display.set_mode((constants.tile_size*10, constants.tile_size*10))
         self.font = pygame.font.SysFont('comicsansms', 30)
+        self.turn = 1
         self.run()
+
+    def check_win(self):
+        if len(self.player1.get_pieces()) < 1 or len(self.player2.get_pieces()) < 1:
+            return True
+
+
+    def reset(self):
+        self.player1 = Player('white')
+        self.player2 = Player('black')
+        self.turn = 1
 
 
     def run(self):
-        turn = 1
+        # turn = 1
         running = True
         while running:
             for event in pygame.event.get():
@@ -33,8 +44,25 @@ class Game:
                     print(pos)
                     # print('X pos: '+str(x))
                     # print('Y pos: '+str(y))
-                    if turn == 1:
+                    if self.turn == 1:
+                        for p in self.player2.get_pieces():
+                            p.selected = False
+
                         for p in self.player1.get_pieces():
+                            if p.selected:
+                                possible_moves = p.possible_moves(self.player2, self.player1)
+                                for move in possible_moves:
+                                    if move[0]*constants.tile_size+constants.tile_size < pos[0] and move[1]*constants.tile_size+constants.tile_size < pos[1] and move[0]*constants.tile_size+2*constants.tile_size > pos[0] and move[1]*constants.tile_size+2*constants.tile_size > pos[1]:
+                                        self.turn = 2
+                                        if abs(p.y-move[1]) > 1:
+                                            x = (p.x+move[0])/2
+                                            y = (p.y+move[1])/2
+                                            for p2 in self.player2.pieces:
+                                                if p2.x == x and p2.y == y:
+                                                    self.player2.pieces.remove(p2)
+                                                    self.turn = 1
+
+                                        p.move_to(move)
                             # print(p.get_pos())
                             # [0, 50] < [100, 0] <- True/
                             top_left = [p.get_pos()[0]*constants.tile_size+constants.tile_size, p.get_pos()[1]*constants.tile_size+constants.tile_size]
@@ -46,8 +74,25 @@ class Game:
                                     piece.selected = False
                                 p.selected = True
                                 print(str(p.get_pos())+' selected')
-                    elif turn == 2:
+                    elif self.turn == 2:
+                        for p in self.player1.get_pieces():
+                            p.selected = False
+
                         for p in self.player2.get_pieces():
+                            if p.selected:
+                                possible_moves = p.possible_moves(self.player1, self.player2)
+                                for move in possible_moves:
+                                    if move[0]*constants.tile_size+constants.tile_size < pos[0] and move[1]*constants.tile_size+constants.tile_size < pos[1] and move[0]*constants.tile_size+2*constants.tile_size > pos[0] and move[1]*constants.tile_size+2*constants.tile_size > pos[1]:
+                                        self.turn = 1
+                                        if abs(p.y-move[1]) > 1:
+                                            x = (p.x+move[0])/2
+                                            y = (p.y+move[1])/2
+                                            for p2 in self.player1.pieces:
+                                                if p2.x == x and p2.y == y:
+                                                    self.player1.pieces.remove(p2)
+                                                    self.turn = 2
+
+                                        p.move_to(move)
                             # print(p.get_pos())
                             # [0, 50] < [100, 0]
                             top_left = [p.get_pos()[0]*constants.tile_size+constants.tile_size, p.get_pos()[1]*constants.tile_size+constants.tile_size]
@@ -61,11 +106,20 @@ class Game:
                                 print(str(p.get_pos())+' selected')
 
 
-            if turn == 1:
+            if self.turn == 1:
                 turn_text = self.font.render("White's Turn", True, constants.black)
+                for p in self.player2.get_pieces():
+                    p.selected = False
             else:
                 turn_text = self.font.render("Black's Turn", True, constants.black)
+                for p in self.player1.get_pieces():
+                    p.selected = False
 
+            if self.check_win():
+                self.reset()
+
+            self.player1.update()
+            self.player2.update()
 
             self.screen.fill(constants.white)
             self.board.draw_board(self.screen)
