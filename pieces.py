@@ -19,7 +19,10 @@ class Piece:
     def king(self):
         self.type = 'king'
 
-    def possible_moves(self, player):
+    def get_pos(self):
+        return list([self.x, self.y])
+
+    def possible_moves(self, other_player, this_player):
         moves = []
         final_moves = []
         if self.type == 'checker':
@@ -37,7 +40,10 @@ class Piece:
 
         for move in moves:
             already = False
-            for p in player.get_pieces():
+            for p in other_player.get_pieces():
+                if move == [p.x, p.y]:
+                    already = True
+            for p in this_player.get_pieces():
                 if move == [p.x, p.y]:
                     already = True
 
@@ -50,7 +56,7 @@ class Piece:
 
 
 
-    def draw(self, screen, other_player):
+    def draw(self, screen, other_player, this_player):
         if self.type == 'checker':
             if self.color == 'white':
                 screen.blit(images.white_checker, [self.x*constants.tile_size+constants.tile_size, self.y*constants.tile_size+constants.tile_size])
@@ -64,5 +70,5 @@ class Piece:
 
         if self.selected:
             pygame.draw.rect(screen, constants.red, pygame.Rect(self.x*constants.tile_size+constants.tile_size, self.y*constants.tile_size+constants.tile_size, constants.tile_size, constants.tile_size), 3)
-            for pos in self.possible_moves(other_player):
-                pygame.draw.rect(screen, constants.red, pygame.Rect(pos[0]*constants.tile_size+constants.tile_size, pos[1]*constants.tile_size+constants.tile_size, constants.tile_size, constants.tile_size), 3)
+            for pos in self.possible_moves(other_player, this_player):
+                pygame.draw.rect(screen, constants.green, pygame.Rect(pos[0]*constants.tile_size+constants.tile_size, pos[1]*constants.tile_size+constants.tile_size, constants.tile_size, constants.tile_size), 3)

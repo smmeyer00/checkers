@@ -21,8 +21,8 @@ class Player:
                     self.pieces.append(Piece(x, 7, color))
 
     def get_pieces(self):
-        return self.pieces
+        return list(self.pieces)
 
-    def draw(self, screen, other_player):
+    def draw(self, screen, other_player, this_player):
         for p in self.pieces:
-            p.draw(screen, other_player)
+            p.draw(screen, other_player, this_player)
