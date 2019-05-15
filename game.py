@@ -32,6 +32,14 @@ class Game:
         self.turn = 1
 
 
+    def draw_buttons(self):
+        pygame.draw.rect(self.screen, constants.red, pygame.Rect(0, constants.tile_size*9, constants.tile_size*2, constants.tile_size))
+        text = self.font.render("Reset", True, constants.black)
+        self.screen.blit(text, [0, constants.tile_size*9])
+
+        # finish later, draw reset button bottom left corner
+
+
     def run(self):
         # turn = 1
         running = True
@@ -44,6 +52,10 @@ class Game:
                     print(pos)
                     # print('X pos: '+str(x))
                     # print('Y pos: '+str(y))
+
+                    if 0 < pos[0] < constants.tile_size*2 and constants.tile_size*9 < pos[1] < constants.tile_size*10:
+                        self.reset()
+
                     if self.turn == 1:
                         for p in self.player2.get_pieces():
                             p.selected = False
@@ -54,17 +66,19 @@ class Game:
                                 for move in possible_moves:
                                     if move[0]*constants.tile_size+constants.tile_size < pos[0] and move[1]*constants.tile_size+constants.tile_size < pos[1] and move[0]*constants.tile_size+2*constants.tile_size > pos[0] and move[1]*constants.tile_size+2*constants.tile_size > pos[1]:
                                         self.turn = 2
+                                        jump = False
                                         if abs(p.y-move[1]) > 1:
                                             x = (p.x+move[0])/2
                                             y = (p.y+move[1])/2
+                                            jump = True
                                             for p2 in self.player2.pieces:
                                                 if p2.x == x and p2.y == y:
                                                     self.player2.pieces.remove(p2)
-                                                    self.turn = 1
 
                                         p.move_to(move)
-                            # print(p.get_pos())
-                            # [0, 50] < [100, 0] <- True/
+                                        if jump and p.jump_possible(self.player2, self.player1):
+                                            self.turn = 1
+
                             top_left = [p.get_pos()[0]*constants.tile_size+constants.tile_size, p.get_pos()[1]*constants.tile_size+constants.tile_size]
                             print(top_left)
                             bottom_right = [p.get_pos()[0]*constants.tile_size+2*constants.tile_size, p.get_pos()[1]*constants.tile_size+2*constants.tile_size]
@@ -84,17 +98,19 @@ class Game:
                                 for move in possible_moves:
                                     if move[0]*constants.tile_size+constants.tile_size < pos[0] and move[1]*constants.tile_size+constants.tile_size < pos[1] and move[0]*constants.tile_size+2*constants.tile_size > pos[0] and move[1]*constants.tile_size+2*constants.tile_size > pos[1]:
                                         self.turn = 1
+                                        jump = False
                                         if abs(p.y-move[1]) > 1:
                                             x = (p.x+move[0])/2
                                             y = (p.y+move[1])/2
+                                            jump = True
                                             for p2 in self.player1.pieces:
                                                 if p2.x == x and p2.y == y:
                                                     self.player1.pieces.remove(p2)
-                                                    self.turn = 2
 
                                         p.move_to(move)
-                            # print(p.get_pos())
-                            # [0, 50] < [100, 0]
+                                        if jump and p.jump_possible(self.player1, self.player2):
+                                            self.turn = 2
+
                             top_left = [p.get_pos()[0]*constants.tile_size+constants.tile_size, p.get_pos()[1]*constants.tile_size+constants.tile_size]
                             print(top_left)
                             bottom_right = [p.get_pos()[0]*constants.tile_size+2*constants.tile_size, p.get_pos()[1]*constants.tile_size+2*constants.tile_size]
@@ -123,6 +139,7 @@ class Game:
 
             self.screen.fill(constants.white)
             self.board.draw_board(self.screen)
+            self.draw_buttons()
             self.screen.blit(turn_text, (0, 0))
             self.player1.draw(self.screen, self.player2, self.player1)
             self.player2.draw(self.screen, self.player1, self.player2)

@@ -24,6 +24,11 @@ class Player:
         for p in self.pieces:
             p.update()
 
+    def jump_possible(self, other_player):
+        for p in self.pieces:
+            if p.jump_possible(other_player, self):
+                return True
+
     def get_pieces(self):
         return list(self.pieces)
 
