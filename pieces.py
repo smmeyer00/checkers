@@ -85,38 +85,16 @@ class Piece:
 
 
     def jump_possible(self, other_player, this_player):
-        jumps = []
-        final_jumps = []
-        if self.type == 'checker':
-            if self.color == 'white':
-                jumps.append([self.x-1, self.y+1])
-                jumps.append([self.x+1, self.y+1])
-            if self.color == 'black':
-                jumps.append([self.x-1, self.y-1])
-                jumps.append([self.x+1, self.y-1])
-        elif self.type == 'king':
-            jumps.append([self.x-1, self.y+1])
-            jumps.append([self.x+1, self.y+1])
-            jumps.append([self.x-1, self.y-1])
-            jumps.append([self.x+1, self.y-1])
+        moves = self.possible_moves(other_player, this_player)
+        final_moves = []
+        for move in moves:
+            if abs(self.y-move[1]) > 1:
+                final_moves.append(move)
 
-        for move in jumps:
-            already = False
-            for p in other_player.get_pieces():
-                if move == [p.x, p.y]:
-                    already = True
+        if len(final_moves) > 0:
+            return True
 
-            for p in this_player.get_pieces():
-                if move == [p.x, p.y]:
-                    already = True
-
-            if not already:
-                final_jumps.append(move)
-
-            if len(final_jumps) > 0:
-                return True
-
-            return False
+        return False
 
 
 
