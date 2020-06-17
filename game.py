@@ -3,7 +3,6 @@ from board import Board
 import images
 import constants
 from player import *
-import time
 
 
 class Game:
@@ -19,17 +18,12 @@ class Game:
         self.player2 = Player('black')
         self.screen = pygame.display.set_mode((constants.tile_size*10, constants.tile_size*10))
         self.font = pygame.font.SysFont('comicsansms', 30)
-        self.winner_font = pygame.font.SysFont('comicsansms', 70)
         self.turn = 1
         self.run()
 
     def check_win(self):
-        if len(self.player1.get_pieces()) < 1:
-            return 2
-        elif len(self.player2.get_pieces()) < 1:
-            return 1
-
-        return 0
+        if len(self.player1.get_pieces()) < 1 or len(self.player2.get_pieces()) < 1:
+            return True
 
 
     def reset(self):
@@ -137,17 +131,7 @@ class Game:
                 for p in self.player1.get_pieces():
                     p.selected = False
 
-            if self.check_win() == 1:
-                text = self.winner_font.render('White wins!', True, constants.blue)
-                self.screen.blit(text, [0, constants.tile_size*5-35])
-                pygame.display.flip()
-                time.sleep(3)
-                self.reset()
-            elif self.check_win() == 2:
-                text = self.winner_font.render('Black wins!', True, constants.blue)
-                self.screen.blit(text, [0, constants.tile_size*5-35])
-                pygame.display.flip()
-                time.sleep(3)
+            if self.check_win():
                 self.reset()
 
             self.player1.update()
